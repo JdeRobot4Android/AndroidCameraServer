@@ -32,9 +32,9 @@ public class CameraI extends jderobot._CameraDisp {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	CameraDescription descripcion;
-	
-	CameraI() {
+    CameraDescription descripcion;
+    
+    CameraI() {
 		descripcion = new CameraDescription();
 		descripcion.name = "Android";
 		/* Inicializamos la descripción de la imagen */
@@ -50,17 +50,15 @@ public class CameraI extends jderobot._CameraDisp {
 		idImagen.timeStamp.seconds = 0;
 		idImagen.timeStamp.useconds = 0;
 	}
-	
+    
 	@Override
 	public CameraDescription getCameraDescription(Current __current) {
-		// TODO Auto-generated method stub
 		return descripcion;
 	}
 
 	@Override
 	public int setCameraDescription(CameraDescription description,
 			Current __current) {
-		// TODO Auto-generated method stub
 		descripcion = description;
 		return 0;
 	}
@@ -76,7 +74,13 @@ public class CameraI extends jderobot._CameraDisp {
 		// TODO Auto-generated method stub
 		
 	}
-	
+
+	@Override
+	public void reset(Current __current) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	/**
 	 * Entrega la descripción de la imagen.
 	 * @return Datos de la descripción de la imagen
@@ -112,9 +116,4 @@ public class CameraI extends jderobot._CameraDisp {
 	    private AMD_ImageProvider_getImageData cb;
 	}
 
-	@Override
-	public void reset(Current __current) {
-		// TODO Auto-generated method stub
-		
-	}
 }
