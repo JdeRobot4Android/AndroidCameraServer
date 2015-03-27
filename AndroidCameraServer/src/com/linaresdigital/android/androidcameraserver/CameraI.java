@@ -111,4 +111,10 @@ public class CameraI extends jderobot._CameraDisp {
 
 	    private AMD_ImageProvider_getImageData cb;
 	}
+
+	@Override
+	public void reset(Current __current) {
+		// TODO Auto-generated method stub
+		
+	}
 }
