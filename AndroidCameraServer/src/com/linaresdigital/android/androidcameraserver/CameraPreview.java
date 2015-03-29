@@ -11,11 +11,9 @@ import android.view.SurfaceHolder;
 
 import android.content.Context;
 
-import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.AutoFocusCallback;
-import android.hardware.Camera.Size;
 
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     private SurfaceHolder mHolder;
@@ -39,20 +37,20 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             Log.i("Resolution", "Width: " + result.width + " x Height: " + result.height); 
         }
         //mParameters.setPreviewSize(320, 240);
-        mParameters.setPreviewSize(864, 480);
+        mParameters.setPreviewSize(320, 240);
         /*mParameters.setPreviewFormat(ImageFormat.YUY2);*/
 
         /* 
          * Set camera to continuous focus if supported, otherwise use
          * software auto-focus. Only works for API level >=9.
          */
-        /*for (String f : mParameters.getSupportedFocusModes()) {
-            if (f == mParameters.FOCUS_MODE_CONTINUOUS_PICTURE) {
-                mCamera.setFocusMode(Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+        for (String f : mParameters.getSupportedFocusModes()) {
+            if (f == mParameters.FOCUS_MODE_CONTINUOUS_VIDEO) {
+            	mParameters.setFocusMode(f);
                 autoFocusCallback = null;
                 break;
             }
-        }*/
+        }
 
         mCamera.setParameters(mParameters);
         // Install a SurfaceHolder.Callback so we get notified when the
