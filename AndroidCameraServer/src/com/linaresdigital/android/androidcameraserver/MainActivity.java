@@ -25,15 +25,15 @@ public class MainActivity extends Activity {
 
 	private static final String TAG = MainActivity.class.getClass().getName();
 	/**
-	 * Instancia de la implementación de ImageProvider que será publicada.
+	 * Instance of imageprovider to be published
 	 */
 	private CameraI cameraA;
 	/**
-	 * Instancia de la cámara que se usará en la actividad.
+	 * Instance of camera to be used in activity
 	 */
 	static private Camera mCamera;
 	/**
-	 * Instancia de la implementación de la vista preliminar que usaremos.
+	 * Instance of implementation of the preview that we use
 	 */
 	private CameraPreview mPreview;
 	private Handler autoFocusHandler;
@@ -45,23 +45,23 @@ public class MainActivity extends Activity {
 	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		/* Comienzo habitual */
+		/* General habitual top */
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		/* Requerimos orientación en modo retrato */
+		/* We require orientation in potrait mode */
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-		/* Si la cámara no soporta autofocus continuo proporcionaremos uno */
+		/* Provide autofocus if camera does not support one */
 		autoFocusHandler = new Handler();
-		/* Obtenemos la instancia a la cámara */
+		/* Get the instance of the camera */
 		mCamera = getCameraInstance();
-		/* Creamos una instancia de CameraPreview para gestionar la cámara */
+		/* We create an instance of camera preview to manage the camera */
 		mPreview = new CameraPreview(this, mCamera, previewCb, autoFocusCB);
-		/* Buscamos el marco que contendrá la vista preliminar de la cámara */
+		/* Search the camera preview in frame layout */
 		preview = (FrameLayout) findViewById(R.id.frameLayout);
-		/* Agregamos la vista */
+		/* Add view */
 		preview.addView(mPreview);
 
-		/* Inicializamos ICE, copiado de un ejemplo */
+		/* Initialize ICE, copied from an example */
 		/**************************************************************************/
 		if (VERSION.SDK_INT == 8) // android.os.Build.VERSION_CODES.FROYO (8)
 		{
@@ -75,7 +75,7 @@ public class MainActivity extends Activity {
 					"false");
 		}
 
-		/* Continuación del ejemplo copiado */
+		/* Continuing the example copied */
 		// SSL initialization can take some time. To avoid blocking the
 		// calling thread, we perform the initialization in a separate thread.
 		new Thread(new Runnable() {
@@ -87,12 +87,12 @@ public class MainActivity extends Activity {
 	}
 
 	/**
-	 * Una forma segura de obtener la instancia de la cámara.
+	 * One sure way to get the instance of camera
 	 */
 	public static Camera getCameraInstance() {
 		Camera camara = null;
 		try {
-			/* Abrimos la cámara */
+			/* Open the camera */
 			camara = Camera.open();
 		} catch (Exception e) {
 			Log.e(TAG, "No se pudo inicializar la cámara");
@@ -102,11 +102,11 @@ public class MainActivity extends Activity {
 
 	private void releaseCamera() {
 		if (mCamera != null) {
-			/* Desactivamos callbacks */
+			/* Disable callbacks */
 			mCamera.setPreviewCallback(null);
 			mCamera.release();
 			mCamera = null;
-			/* Guardamos el estado */
+			/* Save the state */
 			previsualizando = false;
 		}
 	}
@@ -187,15 +187,15 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		/* Creamos una instancia de CameraPreview para gestionar la cámara */
+		/* Create an instance of camerapreview to manage the camera */
 		mPreview = new CameraPreview(this, mCamera, previewCb, autoFocusCB);
-		/* Buscamos el marco que contendrá la vista preliminar de la cámara */
+		/* Search the framelayout for the camera preview */
 		preview = (FrameLayout) findViewById(R.id.frameLayout);
-		/* Agregamos la vista */
+		/* Add view */
 		preview.addView(mPreview);
 	}
 
-	/* Implementación ICE */
+	/* Implementation of ICE */
 	interface CommunicatorCallback {
 		void onWait();
 

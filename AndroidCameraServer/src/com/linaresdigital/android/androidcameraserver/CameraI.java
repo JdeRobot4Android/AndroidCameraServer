@@ -12,7 +12,7 @@ import Ice.Current;
 public class CameraI extends jderobot._CameraDisp {
 
 	/**
-     * La descripción de la imagen que será entregada en
+     * Get the description of the image that will be delivered
      * <code>getImageDescription</code>.
      *
      * @see #getImageDescription()
@@ -20,7 +20,7 @@ public class CameraI extends jderobot._CameraDisp {
     public static ImageDescription idDatos;
 
 	/**
-     * Contenido de la imagen (incluyendo descripción y fecha) que será entregado en
+     * Get the image content(including date and description)
      * <code>getImageData</code>.
      *
      * @see #getImageData()
@@ -28,7 +28,7 @@ public class CameraI extends jderobot._CameraDisp {
     public static ImageData idImagen;
 	
 	/**
-	 * Número de serie generado.
+	 * Serial number generated
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -37,12 +37,12 @@ public class CameraI extends jderobot._CameraDisp {
     CameraI() {
 		descripcion = new CameraDescription();
 		descripcion.name = "Android";
-		/* Inicializamos la descripción de la imagen */
+		/* Initialize image description */
 		idDatos = new ImageDescription();
 		idDatos.height = 0;
 		idDatos.width = 0;
 		idDatos.format = "NONE";
-		/* Inicializamos los datos de la imagen */
+		/* Initialize the image data */
 		idImagen = new ImageData();
 		idImagen.pixelData = new byte[0];
 		idImagen.description = idDatos;
@@ -82,8 +82,8 @@ public class CameraI extends jderobot._CameraDisp {
 	}
 
 	/**
-	 * Entrega la descripción de la imagen.
-	 * @return Datos de la descripción de la imagen
+	 * Will get the description of the image
+	 * @return Gives the detail of image description
 	 */
 	@Override
 	public ImageDescription getImageDescription(Current __current) {
@@ -92,7 +92,7 @@ public class CameraI extends jderobot._CameraDisp {
 
 	static public java.util.LinkedList<Job> _jobs = new java.util.LinkedList<Job>();
 	/**
-	 * Entrega la imagen y su descripción asociada.
+	 * Gets image and its associated description
 	 */
 	@Override
 	public void getImageData_async(AMD_ImageProvider_getImageData __cb,
