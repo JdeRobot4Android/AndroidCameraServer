@@ -1,6 +1,7 @@
 /**
- * Actividad de prueba que enmarca y controla tanto la vista preliminar de la cámara
- * como la interfaz ICE publicada.
+ * Actividad de prueba que enmarca y controla tanto la vista preliminar de la
+ * cámara como la interfaz ICE publicada.
+ * 
  * @author Óscar Javier García Baudet
  * @version 1.0, 2013-01-08
  */
@@ -25,7 +26,7 @@ public class MainActivity extends Activity {
 
 	private static final String TAG = MainActivity.class.getClass().getName();
 	/**
-	 * Instance of imageprovider to be published
+	 * Instance of ImageProvider implementation to be published
 	 */
 	private CameraI cameraA;
 	/**
@@ -33,7 +34,7 @@ public class MainActivity extends Activity {
 	 */
 	static private Camera mCamera;
 	/**
-	 * Instance of implementation of the preview that we use
+	 * Instance of implementation of the camera preview that we'll use
 	 */
 	private CameraPreview mPreview;
 	private Handler autoFocusHandler;
@@ -45,20 +46,19 @@ public class MainActivity extends Activity {
 	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		/* General habitual top */
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		/* We require orientation in potrait mode */
+		/* We require landscape orientation */
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-		/* Provide autofocus if camera does not support one */
+		/* Provide continuous autofocus if camera does not support it */
 		autoFocusHandler = new Handler();
-		/* Get the instance of the camera */
+		/* Get an instance of the default camera */
 		mCamera = getCameraInstance();
-		/* We create an instance of camera preview to manage the camera */
+		/* We create an instance of CameraPreview to manage the camera */
 		mPreview = new CameraPreview(this, mCamera, previewCb, autoFocusCB);
-		/* Search the camera preview in frame layout */
+		/* Find the frame that will contain the camera preview */
 		preview = (FrameLayout) findViewById(R.id.frameLayout);
-		/* Add view */
+		/* Add view to frame */
 		preview.addView(mPreview);
 
 		/* Initialize ICE, copied from an example */
@@ -87,7 +87,7 @@ public class MainActivity extends Activity {
 	}
 
 	/**
-	 * One sure way to get the instance of camera
+	 * Safe way to get the instance of camera
 	 */
 	public static Camera getCameraInstance() {
 		Camera camara = null;
@@ -187,11 +187,11 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		/* Create an instance of camerapreview to manage the camera */
+		/* Create a fresh instance of CameraPreview to manage the camera */
 		mPreview = new CameraPreview(this, mCamera, previewCb, autoFocusCB);
-		/* Search the framelayout for the camera preview */
+		/* Find the frame that will contain the camera preview */
 		preview = (FrameLayout) findViewById(R.id.frameLayout);
-		/* Add view */
+		/* Add new view to frame */
 		preview.addView(mPreview);
 	}
 
