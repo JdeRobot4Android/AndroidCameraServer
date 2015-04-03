@@ -1,6 +1,6 @@
 /**
- * Implementation of image provider. Almacena los fotogramas capturados así
- * como todos los datos asociados al mismo.
+ * Implementation of ImageProvider.
+ * Stores captured frames and all associated data.
  * @author Óscar Javier García Baudet
  * @version 1.0, 2012-12-08
  */
@@ -18,33 +18,33 @@ import Ice.Current;
 public class ImageProviderI extends jderobot._ImageProviderDisp {
 
 	/**
-     * Get the description of the image that will be delivered
-     * <code>getImageDescription</code>.
-     *
-     * @see #getImageDescription()
-     */
-    public static ImageDescription idDatos;
+	 * Image description that will be delivered by
+	 * <code>getImageDescription</code>
+	 * 
+	 * @see #getImageDescription()
+	 */
+	public static ImageDescription idDatos;
 
 	/**
-     * Get the image content(including date and description)
-     * <code>getImageData</code>.
-     *
-     * @see #getImageData()
-     */
-    public static ImageData idImagen;
-	
+	 * Image content (including date and description) that will be delivered by
+	 * <code>getImageData</code>
+	 * 
+	 * @see #getImageData()
+	 */
+	public static ImageData idImagen;
+
 	/**
 	 * Serial number generated.
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	public ImageProviderI() {
-		/* Initialize imagedescription */
+		/* Initialize image description */
 		idDatos = new ImageDescription();
 		idDatos.height = 0;
 		idDatos.width = 0;
 		idDatos.format = "NONE";
-		/* Initialize the imagedata */
+		/* Initialize image data */
 		idImagen = new ImageData();
 		idImagen.pixelData = new byte[0];
 		idImagen.description = idDatos;
@@ -54,8 +54,9 @@ public class ImageProviderI extends jderobot._ImageProviderDisp {
 	}
 
 	/**
-	 * Gets the image description
-	 * @return Details image description
+	 * Delivers image description
+	 * 
+	 * @return Image description details
 	 */
 	@Override
 	public ImageDescription getImageDescription(Current __current) {
@@ -63,8 +64,9 @@ public class ImageProviderI extends jderobot._ImageProviderDisp {
 	}
 
 	static public java.util.LinkedList<Job> _jobs = new java.util.LinkedList<Job>();
+
 	/**
-	 * Gets image and its associated description
+	 * Delivers image and its associated description
 	 */
 	@Override
 	public void getImageData_async(AMD_ImageProvider_getImageData __cb,
@@ -73,18 +75,18 @@ public class ImageProviderI extends jderobot._ImageProviderDisp {
 		_jobs.add(new Job(__cb));
 	}
 
+	/**
+	 * Implementation of a job queue for batch data delivery
+	 */
 	class Job {
-	    Job(AMD_ImageProvider_getImageData __cb)
-	    {
-	        cb = __cb;
-	    }
+		Job(AMD_ImageProvider_getImageData __cb) {
+			cb = __cb;
+		}
 
-	    void execute()
-	    {
-	        cb.ice_response(idImagen);
-	    }
+		void execute() {
+			cb.ice_response(idImagen);
+		}
 
-
-	    private AMD_ImageProvider_getImageData cb;
+		private AMD_ImageProvider_getImageData cb;
 	}
 }
