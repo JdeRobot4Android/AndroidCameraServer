@@ -21,6 +21,7 @@ import android.content.pm.ActivityInfo;
 import android.util.Log;
 import android.view.Menu;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -52,14 +53,6 @@ public class MainActivity extends Activity {
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		/* Provide continuous autofocus if camera does not support it */
 		autoFocusHandler = new Handler();
-		/* Get an instance of the default camera */
-		mCamera = getCameraInstance();
-		/* We create an instance of CameraPreview to manage the camera */
-		mPreview = new CameraPreview(this, mCamera, previewCb, autoFocusCB);
-		/* Find the frame that will contain the camera preview */
-		preview = (FrameLayout) findViewById(R.id.frameLayout);
-		/* Add view to frame */
-		preview.addView(mPreview);
 
 		/* Initialize ICE, copied from an example */
 		/**************************************************************************/
@@ -104,6 +97,8 @@ public class MainActivity extends Activity {
 		if (mCamera != null) {
 			/* Disable callbacks */
 			mCamera.setPreviewCallback(null);
+			mCamera.stopPreview();
+			mCamera.lock();
 			mCamera.release();
 			mCamera = null;
 			/* Save the state */
@@ -178,20 +173,27 @@ public class MainActivity extends Activity {
 	}
 
 	public void onPause() {
-		super.onPause();
 		releaseCamera();
 		preview.removeAllViews();
 		mPreview = null;
+		super.onPause();
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		/* Create a fresh instance of CameraPreview to manage the camera */
+		/* Get an instance of the default camera */
+		mCamera = getCameraInstance();
+		if (mCamera == null) {
+			Toast.makeText(getApplicationContext(), R.string.error_camera,
+					Toast.LENGTH_LONG);
+			this.finish();
+		}
+		/* We create an instance of CameraPreview to manage the camera */
 		mPreview = new CameraPreview(this, mCamera, previewCb, autoFocusCB);
 		/* Find the frame that will contain the camera preview */
 		preview = (FrameLayout) findViewById(R.id.frameLayout);
-		/* Add new view to frame */
+		/* Add view to frame */
 		preview.addView(mPreview);
 	}
 
