@@ -12,29 +12,29 @@ import Ice.Current;
 public class CameraI extends jderobot._CameraDisp {
 
 	/**
-     * Get the description of the image that will be delivered
-     * <code>getImageDescription</code>.
-     *
-     * @see #getImageDescription()
-     */
-    public static ImageDescription idDatos;
+	 * Get the description of the image that will be delivered at
+	 * <code>getImageDescription</code>
+	 * 
+	 * @see #getImageDescription()
+	 */
+	public static ImageDescription idDatos;
 
 	/**
-     * Get the image content(including date and description)
-     * <code>getImageData</code>.
-     *
-     * @see #getImageData()
-     */
-    public static ImageData idImagen;
-	
+	 * Get the image content (including date and description) that will
+	 * delivered at <code>getImageData</code>
+	 * 
+	 * @see #getImageData()
+	 */
+	public static ImageData idImagen;
+
 	/**
 	 * Serial number generated
 	 */
 	private static final long serialVersionUID = 1L;
 
-    CameraDescription descripcion;
-    
-    CameraI() {
+	CameraDescription descripcion;
+
+	CameraI() {
 		descripcion = new CameraDescription();
 		descripcion.name = "Android";
 		/* Initialize image description */
@@ -42,7 +42,7 @@ public class CameraI extends jderobot._CameraDisp {
 		idDatos.height = 0;
 		idDatos.width = 0;
 		idDatos.format = "NONE";
-		/* Initialize the image data */
+		/* Initialize image data */
 		idImagen = new ImageData();
 		idImagen.pixelData = new byte[0];
 		idImagen.description = idDatos;
@@ -50,7 +50,7 @@ public class CameraI extends jderobot._CameraDisp {
 		idImagen.timeStamp.seconds = 0;
 		idImagen.timeStamp.useconds = 0;
 	}
-    
+
 	@Override
 	public CameraDescription getCameraDescription(Current __current) {
 		return descripcion;
@@ -72,18 +72,17 @@ public class CameraI extends jderobot._CameraDisp {
 	@Override
 	public void stopCameraStreaming(Current __current) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void reset(Current __current) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	/**
-	 * Will get the description of the image
-	 * @return Gives the detail of image description
+	 * Delivers image description
+	 * 
+	 * @return Image description data
 	 */
 	@Override
 	public ImageDescription getImageDescription(Current __current) {
@@ -91,8 +90,9 @@ public class CameraI extends jderobot._CameraDisp {
 	}
 
 	static public java.util.LinkedList<Job> _jobs = new java.util.LinkedList<Job>();
+
 	/**
-	 * Gets image and its associated description
+	 * Delivers image and its associated description
 	 */
 	@Override
 	public void getImageData_async(AMD_ImageProvider_getImageData __cb,
@@ -102,18 +102,15 @@ public class CameraI extends jderobot._CameraDisp {
 	}
 
 	class Job {
-	    Job(AMD_ImageProvider_getImageData __cb)
-	    {
-	        cb = __cb;
-	    }
+		Job(AMD_ImageProvider_getImageData __cb) {
+			cb = __cb;
+		}
 
-	    void execute()
-	    {
-	        cb.ice_response(idImagen);
-	    }
+		void execute() {
+			cb.ice_response(idImagen);
+		}
 
-
-	    private AMD_ImageProvider_getImageData cb;
+		private AMD_ImageProvider_getImageData cb;
 	}
 
 }
