@@ -1,2 +1,2 @@
 # AndroidCameraServer
-Componente JdeRobot "cameraserver" para Android
+Component JdeRobot "cameraserver" for Android"

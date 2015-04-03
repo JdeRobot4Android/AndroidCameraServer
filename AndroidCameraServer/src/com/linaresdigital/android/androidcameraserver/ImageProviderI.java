@@ -1,5 +1,5 @@
 /**
- * Implementación de ImageProvider. Almacena los fotogramas capturados así
+ * Implementation of image provider. Almacena los fotogramas capturados así
  * como todos los datos asociados al mismo.
  * @author Óscar Javier García Baudet
  * @version 1.0, 2012-12-08
@@ -18,7 +18,7 @@ import Ice.Current;
 public class ImageProviderI extends jderobot._ImageProviderDisp {
 
 	/**
-     * La descripción de la imagen que será entregada en
+     * Get the description of the image that will be delivered
      * <code>getImageDescription</code>.
      *
      * @see #getImageDescription()
@@ -26,7 +26,7 @@ public class ImageProviderI extends jderobot._ImageProviderDisp {
     public static ImageDescription idDatos;
 
 	/**
-     * Contenido de la imagen (incluyendo descripción y fecha) que será entregado en
+     * Get the image content(including date and description)
      * <code>getImageData</code>.
      *
      * @see #getImageData()
@@ -34,17 +34,17 @@ public class ImageProviderI extends jderobot._ImageProviderDisp {
     public static ImageData idImagen;
 	
 	/**
-	 * Número de serie generado.
+	 * Serial number generated.
 	 */
 	private static final long serialVersionUID = 1L;
 	
 	public ImageProviderI() {
-		/* Inicializamos la descripción de la imagen */
+		/* Initialize imagedescription */
 		idDatos = new ImageDescription();
 		idDatos.height = 0;
 		idDatos.width = 0;
 		idDatos.format = "NONE";
-		/* Inicializamos los datos de la imagen */
+		/* Initialize the imagedata */
 		idImagen = new ImageData();
 		idImagen.pixelData = new byte[0];
 		idImagen.description = idDatos;
@@ -54,8 +54,8 @@ public class ImageProviderI extends jderobot._ImageProviderDisp {
 	}
 
 	/**
-	 * Entrega la descripción de la imagen.
-	 * @return Datos de la descripción de la imagen
+	 * Gets the image description
+	 * @return Details image description
 	 */
 	@Override
 	public ImageDescription getImageDescription(Current __current) {
@@ -64,7 +64,7 @@ public class ImageProviderI extends jderobot._ImageProviderDisp {
 
 	static public java.util.LinkedList<Job> _jobs = new java.util.LinkedList<Job>();
 	/**
-	 * Entrega la imagen y su descripción asociada.
+	 * Gets image and its associated description
 	 */
 	@Override
 	public void getImageData_async(AMD_ImageProvider_getImageData __cb,
