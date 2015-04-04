@@ -2,15 +2,21 @@
 package com.linaresdigital.android.androidcameraserver;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import android.view.SurfaceView;
 import android.view.SurfaceHolder;
+import android.widget.Toast;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
+import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.AutoFocusCallback;
@@ -21,6 +27,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private Camera.Parameters mParameters;
     private PreviewCallback previewCallback;
     private AutoFocusCallback autoFocusCallback;
+    private float bytesperPixel = 0;
+    private float totalBytes = 0;
+    private static List<List<Integer>> reslist = new ArrayList<List<Integer>>();
+    
 
     public CameraPreview(Context context, Camera camera,
                          PreviewCallback previewCb,
@@ -31,13 +41,21 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         autoFocusCallback = autoFocusCb;
         mParameters = camera.getParameters();
         List<Camera.Size> sizes = mParameters.getSupportedPreviewSizes();
+        bytesperPixel = ((float)ImageFormat.getBitsPerPixel(mParameters.getPreviewFormat()))/8;
+        
         Camera.Size result;
         for (int i=0;i<sizes.size();i++){
             result = (Camera.Size) sizes.get(i);
+            totalBytes = result.width*result.height*bytesperPixel;
+            if(totalBytes < 1048576){
+            	reslist.add(Arrays.asList(result.width, result.height));
+            }
             Log.i("Resolution", "Width: " + result.width + " x Height: " + result.height); 
+            Log.i("Bytes", bytesperPixel + " " + totalBytes ); 
         }
+        //SharedPreferences settings = getSharedPreferences("");
         //mParameters.setPreviewSize(320, 240);
-        mParameters.setPreviewSize(320, 240);
+        mParameters.setPreviewSize(1280, 720);
         /*mParameters.setPreviewFormat(ImageFormat.YUY2);*/
 
         /* 
@@ -115,5 +133,9 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCamera.setParameters(mParameters);
             mCamera.autoFocus(autoFocusCallback);
         }
+    }
+    
+    public List<List<Integer>> getResList (){
+    	return reslist;
     }
 }

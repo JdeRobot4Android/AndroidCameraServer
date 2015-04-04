@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+
+    <PreferenceCategory android:title="Basic Settings">
+        
+		<EditTextPreference android:defaultValue="@string/port" android:key="@string/PortNumber" android:title="@string/PortNumber"/>
+		<ListPreference   android:entries="@array/listOptions" android:entryValues="@array/listValues" android:key="listpref" android:summary="List of resolutions" android:title="List of Resolutions" />    
+    </PreferenceCategory>
+    
+</PreferenceScreen>
