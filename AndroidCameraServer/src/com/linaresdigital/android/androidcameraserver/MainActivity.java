@@ -185,8 +185,7 @@ public class MainActivity extends Activity {
 		/* Get an instance of the default camera */
 		mCamera = getCameraInstance();
 		if (mCamera == null) {
-			Toast.makeText(getApplicationContext(), R.string.error_camera,
-					Toast.LENGTH_LONG);
+			Toast.makeText(getApplicationContext(), R.string.error_camera, Toast.LENGTH_LONG).show();
 			this.finish();
 		}
 		/* We create an instance of CameraPreview to manage the camera */
