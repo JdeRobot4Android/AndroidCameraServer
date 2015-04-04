@@ -19,15 +19,17 @@ import android.hardware.Camera.Size;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Build.VERSION;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -57,6 +59,7 @@ public class MainActivity extends Activity {
 	private int width;
 	private int height;
 	private String dimensions;
+	PowerManager.WakeLock wl;
 	
 
 	/**
@@ -64,6 +67,9 @@ public class MainActivity extends Activity {
 	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		
+		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+		wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		/* We require landscape orientation */
@@ -82,6 +88,14 @@ public class MainActivity extends Activity {
 		//Get the value for port and protocol
 		port = prefs.getString("Port Number", "9999");
 		protocol = prefs.getString("protocol", "default");
+		
+		//Check wakelock and lockscreen
+		if(prefs.getBoolean("lockscreen", false) == true){
+			getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		}
+		if(prefs.getBoolean("wakelock", false)== true){
+			wl.acquire();
+		}
 		
 		/* Initialize ICE, copied from an example */
 		/**************************************************************************/
@@ -245,6 +259,12 @@ public class MainActivity extends Activity {
 		releaseCamera();
 		preview.removeAllViews();
 		mPreview = null;
+		Log.e(TAG, wl.isHeld() + "" );
+		if(wl.isHeld()==true){
+			 wl.release();
+			
+		}
+		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		super.onPause();
 	}
 
@@ -277,7 +297,17 @@ public class MainActivity extends Activity {
 		port = prefs.getString("Port Number", "9999");
 		protocol = prefs.getString("protocol", "default");
 		
-		
+		//Check wakelock and lockscreen
+		if(prefs.getBoolean("lockscreen", false) == true){
+			getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		}else{
+			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		}
+		if(prefs.getBoolean("wakelock", false)== true){
+			wl.acquire();
+		}
+//		Toast.makeText(getApplicationContext(), prefs.getBoolean("lockscreen", false) + "lockscreen", Toast.LENGTH_LONG).show();
+//		Toast.makeText(getApplicationContext(), prefs.getBoolean("wakelock", false) + "wakelock", Toast.LENGTH_LONG).show();
 		//Initialize the Communicator again as ports and protocol have been changed
 		new Thread(new Runnable() {
 			public void run() {
