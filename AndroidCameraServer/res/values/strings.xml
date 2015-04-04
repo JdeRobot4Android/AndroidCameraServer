@@ -9,6 +9,10 @@
     <string name="protocol">default</string>
     <string name="ProtocolNumber">protocol</string>
     <string name="ProtocolTitle">Protocol(default, tcp or udp)</string>
+    <string name="wakelock">wakelock</string>
+    <string name="wakelocktitle">WakeLock</string>
+    <string name="lockscreen">lockscreen</string>
+    <string name="lockscreentitle">Lock Screen</string>
     
 
 </resources>

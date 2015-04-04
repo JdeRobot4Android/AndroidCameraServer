@@ -13,5 +13,10 @@
 		
 		<ListPreference   android:entries="@array/listOptions" android:entryValues="@array/listValues" android:key="listpref" android:summary="List of resolutions" android:title="List of Resolutions" />    
     </PreferenceCategory>
+    <PreferenceCategory android:title="System Settings">
+        <CheckBoxPreference android:key="@string/wakelock" android:title="@string/wakelocktitle"/>
+    	<CheckBoxPreference android:key="@string/lockscreen" android:title="@string/lockscreentitle"/>    
+    </PreferenceCategory>
+    
     
 </PreferenceScreen>
