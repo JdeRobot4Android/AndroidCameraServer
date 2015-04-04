@@ -2,15 +2,21 @@
 package com.linaresdigital.android.androidcameraserver;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import android.view.SurfaceView;
 import android.view.SurfaceHolder;
+import android.widget.Toast;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
+import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.AutoFocusCallback;
@@ -21,23 +27,44 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private Camera.Parameters mParameters;
     private PreviewCallback previewCallback;
     private AutoFocusCallback autoFocusCallback;
+    private float bytesperPixel = 0;
+    private float totalBytes = 0;
+    //List for storing widths and heights
+    private static List<List<Integer>> reslist = new ArrayList<List<Integer>>();
+    
 
     public CameraPreview(Context context, Camera camera,
                          PreviewCallback previewCb,
-                         AutoFocusCallback autoFocusCb) {
+                         AutoFocusCallback autoFocusCb, int wid, int hei) {
         super(context);
         mCamera = camera;
         previewCallback = previewCb;
         autoFocusCallback = autoFocusCb;
         mParameters = camera.getParameters();
         List<Camera.Size> sizes = mParameters.getSupportedPreviewSizes();
+        
+        //Calculate the bytesperPixel for the PreviewFormat
+        bytesperPixel = ((float)ImageFormat.getBitsPerPixel(mParameters.getPreviewFormat()))/8;
+        
+        //Reinitialize the list
+        reslist = new ArrayList<List<Integer>>(); 
+        
         Camera.Size result;
         for (int i=0;i<sizes.size();i++){
             result = (Camera.Size) sizes.get(i);
+            //Calculate total bytes
+            totalBytes = result.width*result.height*bytesperPixel;
+            
+            //ICE limit for bytes is 1048576
+            if(totalBytes < 1048576){
+            	reslist.add(Arrays.asList(result.width, result.height));
+            }
             Log.i("Resolution", "Width: " + result.width + " x Height: " + result.height); 
+            Log.i("Bytes", bytesperPixel + " " + totalBytes ); 
         }
-        //mParameters.setPreviewSize(320, 240);
-        mParameters.setPreviewSize(320, 240);
+        
+        //Set the preview size to width and height
+        mParameters.setPreviewSize(wid, hei);
         /*mParameters.setPreviewFormat(ImageFormat.YUY2);*/
 
         /* 
@@ -115,5 +142,9 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCamera.setParameters(mParameters);
             mCamera.autoFocus(autoFocusCallback);
         }
+    }
+    
+    public List<List<Integer>> getResList (){
+    	return reslist;
     }
 }

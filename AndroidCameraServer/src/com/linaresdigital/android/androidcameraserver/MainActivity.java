@@ -8,6 +8,9 @@
 
 package com.linaresdigital.android.androidcameraserver;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
@@ -16,10 +19,15 @@ import android.hardware.Camera.Size;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Build.VERSION;
+import android.preference.PreferenceManager;
 import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -41,6 +49,15 @@ public class MainActivity extends Activity {
 	private Handler autoFocusHandler;
 	private boolean previsualizando = false;
 	private FrameLayout preview;
+	private static List<List<Integer>> reslist = new ArrayList<List<Integer>>();
+	
+	private String adapterendpoints = " -h 0.0.0.0 -p ";
+	private String port = "9999";
+	private String protocol = "default";
+	private int width;
+	private int height;
+	private String dimensions;
+	
 
 	/**
 	 * 
@@ -53,7 +70,19 @@ public class MainActivity extends Activity {
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		/* Provide continuous autofocus if camera does not support it */
 		autoFocusHandler = new Handler();
-
+		SharedPreferences prefs = PreferenceManager
+			    .getDefaultSharedPreferences(this);
+		dimensions = prefs.getString("listpref", "320 240");	
+		width = Integer.parseInt(dimensions.substring(0, dimensions.indexOf(" ")));
+		height = Integer.parseInt(dimensions.substring(dimensions.indexOf(" ")+1, dimensions.length()));
+		
+		//Toast.makeText(getApplicationContext(), dimensions.substring(0, dimensions.indexOf(" ")), Toast.LENGTH_LONG).show();
+		//Toast.makeText(getApplicationContext(), dimensions.substring(dimensions.indexOf(" ")+1, dimensions.length()), Toast.LENGTH_LONG).show();
+		
+		//Get the value for port and protocol
+		port = prefs.getString("Port Number", "9999");
+		protocol = prefs.getString("protocol", "default");
+		
 		/* Initialize ICE, copied from an example */
 		/**************************************************************************/
 		if (VERSION.SDK_INT == 8) // android.os.Build.VERSION_CODES.FROYO (8)
@@ -168,6 +197,46 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
+	@Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+ 
+        case R.id.menu_settings:
+            Intent i = new Intent(this, Preferences.class);
+            int[][] resolution = new int[reslist.size()][2];
+            for(int a = 0; a < reslist.size(); a++){
+            	resolution[a][0] = reslist.get(a).get(0);
+            	resolution[a][1] = reslist.get(a).get(1); 	
+            }
+            Bundle b=new Bundle();
+            b.putSerializable("Array", resolution);
+            i.putExtras(b);
+            startActivity(i);
+            break;
+ 
+        }
+ 
+        return true;
+    }
+	
+//	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//
+//	    if (requestCode == 1) {
+//	        if(resultCode == RESULT_OK){
+//	            String result=data.getStringExtra("result");
+//	            adapterendpoints = "default -h 0.0.0.0 -p "+ result;
+//	            new Thread(new Runnable() {
+//	    			public void run() {
+//	    				initializeCommunicator();
+//	    			}
+//	    		}).start();
+//	        }
+//	        if (resultCode == RESULT_CANCELED) {
+//	            //Code if there's no result
+//	        }
+//	    }
+//	}//onActivityResult
+	
 	public void onStop() {
 		super.onStop();
 	}
@@ -188,12 +257,33 @@ public class MainActivity extends Activity {
 			Toast.makeText(getApplicationContext(), R.string.error_camera, Toast.LENGTH_LONG).show();
 			this.finish();
 		}
+		
+		/* We call the Preferences and get the selected values*/
+		SharedPreferences prefs = PreferenceManager
+			    .getDefaultSharedPreferences(this);
+		dimensions = prefs.getString("listpref", "320 240");
+		width = Integer.parseInt(dimensions.substring(0, dimensions.indexOf(" ")));
+		height = Integer.parseInt(dimensions.substring(dimensions.indexOf(" ")+1, dimensions.length()));
+		
 		/* We create an instance of CameraPreview to manage the camera */
-		mPreview = new CameraPreview(this, mCamera, previewCb, autoFocusCB);
+		mPreview = new CameraPreview(this, mCamera, previewCb, autoFocusCB, width, height);
+		reslist = mPreview.getResList();
 		/* Find the frame that will contain the camera preview */
 		preview = (FrameLayout) findViewById(R.id.frameLayout);
 		/* Add view to frame */
 		preview.addView(mPreview);
+		
+		//Get the port and protocol
+		port = prefs.getString("Port Number", "9999");
+		protocol = prefs.getString("protocol", "default");
+		
+		
+		//Initialize the Communicator again as ports and protocol have been changed
+		new Thread(new Runnable() {
+			public void run() {
+				initializeCommunicator();
+			}
+		}).start();
 	}
 
 	/* Implementation of ICE */
@@ -214,7 +304,7 @@ public class MainActivity extends Activity {
 			Ice.InitializationData initData = new Ice.InitializationData();
 			initData.properties = Ice.Util.createProperties();
 			initData.properties.setProperty("Ice.Trace.Network", "3");
-
+			
 			//
 			// Only configure IceSSL if we are using Froyo or later.
 			//
@@ -232,11 +322,13 @@ public class MainActivity extends Activity {
 			communicator = Ice.Util.initialize(initData);
 			Ice.ObjectAdapter adapter = communicator
 					.createObjectAdapterWithEndpoints("CameraAdapter",
-							"default -h 0.0.0.0 -p 9999");
+							protocol +adapterendpoints + port);
 			cameraA = new CameraI();
 			adapter.add((Ice.Object) cameraA,
 					Ice.Util.stringToIdentity("cameraA"));
 			adapter.activate();
+			
+			
 			Log.e(TAG, cameraA.ice_id());
 
 			/*
