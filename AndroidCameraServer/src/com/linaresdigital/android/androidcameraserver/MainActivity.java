@@ -250,7 +250,7 @@ public class MainActivity extends Activity {
 
 	@Override
 	protected void onResume() {
-		super.onStop();
+		super.onResume();
 		/* Get an instance of the default camera */
 		mCamera = getCameraInstance();
 		if (mCamera == null) {
