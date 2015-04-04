@@ -45,7 +45,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
          * software auto-focus. Only works for API level >=9.
          */
         for (String f : mParameters.getSupportedFocusModes()) {
-            if (f == mParameters.FOCUS_MODE_CONTINUOUS_VIDEO) {
+            if (f == Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO) {
             	mParameters.setFocusMode(f);
                 autoFocusCallback = null;
                 break;
@@ -66,6 +66,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         // The Surface has been created, now tell the camera where to draw the preview.
         try {
             mCamera.setPreviewDisplay(holder);
+            mCamera.startPreview();
+            
         } catch (IOException e) {
             Log.d("DBG", "Error setting camera preview: " + e.getMessage());
         }
@@ -93,7 +95,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         }
 
         try {
-            // Hard code camera surface rotation 90 degs to match Activity view in portrait
+            // Hard code camera surface rotation 90 degrees to match Activity view in portrait
             mCamera.setDisplayOrientation(0);
 
             mCamera.setPreviewDisplay(mHolder);
