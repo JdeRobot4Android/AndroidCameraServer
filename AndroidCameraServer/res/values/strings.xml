@@ -6,5 +6,9 @@
     <string name="error_camera">Camera couldn\'t be initialized</string>
     <string name="PortNumber">Port Number</string>
     <string name="port">9999</string>
+    <string name="protocol">default</string>
+    <string name="ProtocolNumber">protocol</string>
+    <string name="ProtocolTitle">Protocol(default, tcp or udp)</string>
+    
 
 </resources>

@@ -21,7 +21,7 @@ public class Preferences extends PreferenceActivity {
     CharSequence[] values = new CharSequence[resolution.length];
     for(int a = 0; a < resolution.length ; a++ ){
     	entries[a]= resolution[a][0] +"x" + resolution[a][1];
-    	values[a] = resolution[a][0] +"" + resolution[a][1];
+    	values[a] = resolution[a][0] +" " + resolution[a][1];
     }
     lp.setEntries(entries);
     lp.setEntryValues(values);

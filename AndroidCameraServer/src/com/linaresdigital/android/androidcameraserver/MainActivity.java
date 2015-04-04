@@ -23,6 +23,7 @@ import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
 import android.util.Log;
 import android.view.Menu;
@@ -50,10 +51,12 @@ public class MainActivity extends Activity {
 	private FrameLayout preview;
 	private static List<List<Integer>> reslist = new ArrayList<List<Integer>>();
 	
-	private String adapterendpoints = "default -h 0.0.0.0 -p ";
+	private String adapterendpoints = " -h 0.0.0.0 -p ";
 	private String port = "9999";
+	private String protocol = "default";
 	private int width;
 	private int height;
+	private String dimensions;
 	
 
 	/**
@@ -69,7 +72,16 @@ public class MainActivity extends Activity {
 		autoFocusHandler = new Handler();
 		SharedPreferences prefs = PreferenceManager
 			    .getDefaultSharedPreferences(this);
+		dimensions = prefs.getString("listpref", "320 240");	
+		width = Integer.parseInt(dimensions.substring(0, dimensions.indexOf(" ")));
+		height = Integer.parseInt(dimensions.substring(dimensions.indexOf(" ")+1, dimensions.length()));
+		
+		//Toast.makeText(getApplicationContext(), dimensions.substring(0, dimensions.indexOf(" ")), Toast.LENGTH_LONG).show();
+		//Toast.makeText(getApplicationContext(), dimensions.substring(dimensions.indexOf(" ")+1, dimensions.length()), Toast.LENGTH_LONG).show();
+		
+		//Get the value for port and protocol
 		port = prefs.getString("Port Number", "9999");
+		protocol = prefs.getString("protocol", "default");
 		
 		/* Initialize ICE, copied from an example */
 		/**************************************************************************/
@@ -238,25 +250,35 @@ public class MainActivity extends Activity {
 
 	@Override
 	protected void onResume() {
-		super.onResume();
+		super.onStop();
 		/* Get an instance of the default camera */
 		mCamera = getCameraInstance();
 		if (mCamera == null) {
 			Toast.makeText(getApplicationContext(), R.string.error_camera, Toast.LENGTH_LONG).show();
 			this.finish();
 		}
+		
+		/* We call the Preferences and get the selected values*/
+		SharedPreferences prefs = PreferenceManager
+			    .getDefaultSharedPreferences(this);
+		dimensions = prefs.getString("listpref", "320 240");
+		width = Integer.parseInt(dimensions.substring(0, dimensions.indexOf(" ")));
+		height = Integer.parseInt(dimensions.substring(dimensions.indexOf(" ")+1, dimensions.length()));
+		
 		/* We create an instance of CameraPreview to manage the camera */
-		mPreview = new CameraPreview(this, mCamera, previewCb, autoFocusCB);
+		mPreview = new CameraPreview(this, mCamera, previewCb, autoFocusCB, width, height);
 		reslist = mPreview.getResList();
 		/* Find the frame that will contain the camera preview */
 		preview = (FrameLayout) findViewById(R.id.frameLayout);
 		/* Add view to frame */
 		preview.addView(mPreview);
-		SharedPreferences prefs = PreferenceManager
-			    .getDefaultSharedPreferences(this);
-		port = prefs.getString("Port Number", "9999");
 		
-		Toast.makeText(getApplicationContext(), port, Toast.LENGTH_LONG).show();
+		//Get the port and protocol
+		port = prefs.getString("Port Number", "9999");
+		protocol = prefs.getString("protocol", "default");
+		
+		
+		//Initialize the Communicator again as ports and protocol have been changed
 		new Thread(new Runnable() {
 			public void run() {
 				initializeCommunicator();
@@ -282,7 +304,7 @@ public class MainActivity extends Activity {
 			Ice.InitializationData initData = new Ice.InitializationData();
 			initData.properties = Ice.Util.createProperties();
 			initData.properties.setProperty("Ice.Trace.Network", "3");
-
+			
 			//
 			// Only configure IceSSL if we are using Froyo or later.
 			//
@@ -300,11 +322,13 @@ public class MainActivity extends Activity {
 			communicator = Ice.Util.initialize(initData);
 			Ice.ObjectAdapter adapter = communicator
 					.createObjectAdapterWithEndpoints("CameraAdapter",
-							adapterendpoints + port);
+							protocol +adapterendpoints + port);
 			cameraA = new CameraI();
 			adapter.add((Ice.Object) cameraA,
 					Ice.Util.stringToIdentity("cameraA"));
 			adapter.activate();
+			
+			
 			Log.e(TAG, cameraA.ice_id());
 
 			/*

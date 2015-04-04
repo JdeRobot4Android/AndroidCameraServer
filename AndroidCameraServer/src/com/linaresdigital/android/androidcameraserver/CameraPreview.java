@@ -29,33 +29,42 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private AutoFocusCallback autoFocusCallback;
     private float bytesperPixel = 0;
     private float totalBytes = 0;
+    //List for storing widths and heights
     private static List<List<Integer>> reslist = new ArrayList<List<Integer>>();
     
 
     public CameraPreview(Context context, Camera camera,
                          PreviewCallback previewCb,
-                         AutoFocusCallback autoFocusCb) {
+                         AutoFocusCallback autoFocusCb, int wid, int hei) {
         super(context);
         mCamera = camera;
         previewCallback = previewCb;
         autoFocusCallback = autoFocusCb;
         mParameters = camera.getParameters();
         List<Camera.Size> sizes = mParameters.getSupportedPreviewSizes();
+        
+        //Calculate the bytesperPixel for the PreviewFormat
         bytesperPixel = ((float)ImageFormat.getBitsPerPixel(mParameters.getPreviewFormat()))/8;
+        
+        //Reinitialize the list
+        reslist = new ArrayList<List<Integer>>(); 
         
         Camera.Size result;
         for (int i=0;i<sizes.size();i++){
             result = (Camera.Size) sizes.get(i);
+            //Calculate total bytes
             totalBytes = result.width*result.height*bytesperPixel;
+            
+            //ICE limit for bytes is 1048576
             if(totalBytes < 1048576){
             	reslist.add(Arrays.asList(result.width, result.height));
             }
             Log.i("Resolution", "Width: " + result.width + " x Height: " + result.height); 
             Log.i("Bytes", bytesperPixel + " " + totalBytes ); 
         }
-        //SharedPreferences settings = getSharedPreferences("");
-        //mParameters.setPreviewSize(320, 240);
-        mParameters.setPreviewSize(1280, 720);
+        
+        //Set the preview size to width and height
+        mParameters.setPreviewSize(wid, hei);
         /*mParameters.setPreviewFormat(ImageFormat.YUY2);*/
 
         /* 
