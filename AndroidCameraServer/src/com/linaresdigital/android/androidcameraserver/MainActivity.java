@@ -52,7 +52,7 @@ public class MainActivity extends Activity {
 	private boolean previsualizando = false;
 	private FrameLayout preview;
 	private static List<List<Integer>> reslist = new ArrayList<List<Integer>>();
-	
+
 	private String adapterendpoints = " -h 0.0.0.0 -p ";
 	private String port = "9999";
 	private String protocol = "default";
@@ -60,14 +60,13 @@ public class MainActivity extends Activity {
 	private int height;
 	private String dimensions;
 	PowerManager.WakeLock wl;
-	
 
 	/**
 	 * 
 	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		
+
 		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
 		super.onCreate(savedInstanceState);
@@ -77,26 +76,32 @@ public class MainActivity extends Activity {
 		/* Provide continuous autofocus if camera does not support it */
 		autoFocusHandler = new Handler();
 		SharedPreferences prefs = PreferenceManager
-			    .getDefaultSharedPreferences(this);
-		dimensions = prefs.getString("listpref", "320 240");	
-		width = Integer.parseInt(dimensions.substring(0, dimensions.indexOf(" ")));
-		height = Integer.parseInt(dimensions.substring(dimensions.indexOf(" ")+1, dimensions.length()));
-		
-		//Toast.makeText(getApplicationContext(), dimensions.substring(0, dimensions.indexOf(" ")), Toast.LENGTH_LONG).show();
-		//Toast.makeText(getApplicationContext(), dimensions.substring(dimensions.indexOf(" ")+1, dimensions.length()), Toast.LENGTH_LONG).show();
-		
-		//Get the value for port and protocol
+				.getDefaultSharedPreferences(this);
+		dimensions = prefs.getString("listpref", "320 240");
+		width = Integer.parseInt(dimensions.substring(0,
+				dimensions.indexOf(" ")));
+		height = Integer.parseInt(dimensions.substring(
+				dimensions.indexOf(" ") + 1, dimensions.length()));
+
+		// Toast.makeText(getApplicationContext(), dimensions.substring(0,
+		// dimensions.indexOf(" ")), Toast.LENGTH_LONG).show();
+		// Toast.makeText(getApplicationContext(),
+		// dimensions.substring(dimensions.indexOf(" ")+1, dimensions.length()),
+		// Toast.LENGTH_LONG).show();
+
+		// Get the value for port and protocol
 		port = prefs.getString("Port Number", "9999");
 		protocol = prefs.getString("protocol", "default");
-		
-		//Check wakelock and lockscreen
-		if(prefs.getBoolean("lockscreen", false) == true){
-			getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+		// Check wakelock and lockscreen
+		if (prefs.getBoolean("lockscreen", false) == true) {
+			getWindow()
+					.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		}
-		if(prefs.getBoolean("wakelock", false)== true){
+		if (prefs.getBoolean("wakelock", false) == true) {
 			wl.acquire();
 		}
-		
+
 		/* Initialize ICE, copied from an example */
 		/**************************************************************************/
 		if (VERSION.SDK_INT == 8) // android.os.Build.VERSION_CODES.FROYO (8)
@@ -212,45 +217,46 @@ public class MainActivity extends Activity {
 	}
 
 	@Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
- 
-        case R.id.menu_settings:
-            Intent i = new Intent(this, Preferences.class);
-            int[][] resolution = new int[reslist.size()][2];
-            for(int a = 0; a < reslist.size(); a++){
-            	resolution[a][0] = reslist.get(a).get(0);
-            	resolution[a][1] = reslist.get(a).get(1); 	
-            }
-            Bundle b=new Bundle();
-            b.putSerializable("Array", resolution);
-            i.putExtras(b);
-            startActivity(i);
-            break;
- 
-        }
- 
-        return true;
-    }
-	
-//	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//
-//	    if (requestCode == 1) {
-//	        if(resultCode == RESULT_OK){
-//	            String result=data.getStringExtra("result");
-//	            adapterendpoints = "default -h 0.0.0.0 -p "+ result;
-//	            new Thread(new Runnable() {
-//	    			public void run() {
-//	    				initializeCommunicator();
-//	    			}
-//	    		}).start();
-//	        }
-//	        if (resultCode == RESULT_CANCELED) {
-//	            //Code if there's no result
-//	        }
-//	    }
-//	}//onActivityResult
-	
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+
+		case R.id.menu_settings:
+			Intent i = new Intent(this, Preferences.class);
+			int[][] resolution = new int[reslist.size()][2];
+			for (int a = 0; a < reslist.size(); a++) {
+				resolution[a][0] = reslist.get(a).get(0);
+				resolution[a][1] = reslist.get(a).get(1);
+			}
+			Bundle b = new Bundle();
+			b.putSerializable("Array", resolution);
+			i.putExtras(b);
+			startActivity(i);
+			break;
+
+		}
+
+		return true;
+	}
+
+	// protected void onActivityResult(int requestCode, int resultCode, Intent
+	// data) {
+	//
+	// if (requestCode == 1) {
+	// if(resultCode == RESULT_OK){
+	// String result=data.getStringExtra("result");
+	// adapterendpoints = "default -h 0.0.0.0 -p "+ result;
+	// new Thread(new Runnable() {
+	// public void run() {
+	// initializeCommunicator();
+	// }
+	// }).start();
+	// }
+	// if (resultCode == RESULT_CANCELED) {
+	// //Code if there's no result
+	// }
+	// }
+	// }//onActivityResult
+
 	public void onStop() {
 		super.onStop();
 	}
@@ -259,10 +265,10 @@ public class MainActivity extends Activity {
 		releaseCamera();
 		preview.removeAllViews();
 		mPreview = null;
-		Log.e(TAG, wl.isHeld() + "" );
-		if(wl.isHeld()==true){
-			 wl.release();
-			
+		Log.e(TAG, wl.isHeld() + "");
+		if (wl.isHeld() == true) {
+			wl.release();
+
 		}
 		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		super.onPause();
@@ -274,41 +280,51 @@ public class MainActivity extends Activity {
 		/* Get an instance of the default camera */
 		mCamera = getCameraInstance();
 		if (mCamera == null) {
-			Toast.makeText(getApplicationContext(), R.string.error_camera, Toast.LENGTH_LONG).show();
+			Toast.makeText(getApplicationContext(), R.string.error_camera,
+					Toast.LENGTH_LONG).show();
 			this.finish();
 		}
-		
-		/* We call the Preferences and get the selected values*/
+
+		/* We call the Preferences and get the selected values */
 		SharedPreferences prefs = PreferenceManager
-			    .getDefaultSharedPreferences(this);
+				.getDefaultSharedPreferences(this);
 		dimensions = prefs.getString("listpref", "320 240");
-		width = Integer.parseInt(dimensions.substring(0, dimensions.indexOf(" ")));
-		height = Integer.parseInt(dimensions.substring(dimensions.indexOf(" ")+1, dimensions.length()));
-		
+		width = Integer.parseInt(dimensions.substring(0,
+				dimensions.indexOf(" ")));
+		height = Integer.parseInt(dimensions.substring(
+				dimensions.indexOf(" ") + 1, dimensions.length()));
+
 		/* We create an instance of CameraPreview to manage the camera */
-		mPreview = new CameraPreview(this, mCamera, previewCb, autoFocusCB, width, height);
+		mPreview = new CameraPreview(this, mCamera, previewCb, autoFocusCB,
+				width, height);
 		reslist = mPreview.getResList();
 		/* Find the frame that will contain the camera preview */
 		preview = (FrameLayout) findViewById(R.id.frameLayout);
 		/* Add view to frame */
 		preview.addView(mPreview);
-		
-		//Get the port and protocol
+
+		// Get the port and protocol
 		port = prefs.getString("Port Number", "9999");
 		protocol = prefs.getString("protocol", "default");
-		
-		//Check wakelock and lockscreen
-		if(prefs.getBoolean("lockscreen", false) == true){
-			getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-		}else{
-			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+		// Check wakelock and lockscreen
+		if (prefs.getBoolean("lockscreen", false) == true) {
+			getWindow()
+					.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		} else {
+			getWindow().clearFlags(
+					WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		}
-		if(prefs.getBoolean("wakelock", false)== true){
+		if (prefs.getBoolean("wakelock", false) == true) {
 			wl.acquire();
 		}
-//		Toast.makeText(getApplicationContext(), prefs.getBoolean("lockscreen", false) + "lockscreen", Toast.LENGTH_LONG).show();
-//		Toast.makeText(getApplicationContext(), prefs.getBoolean("wakelock", false) + "wakelock", Toast.LENGTH_LONG).show();
-		//Initialize the Communicator again as ports and protocol have been changed
+		// Toast.makeText(getApplicationContext(),
+		// prefs.getBoolean("lockscreen", false) + "lockscreen",
+		// Toast.LENGTH_LONG).show();
+		// Toast.makeText(getApplicationContext(), prefs.getBoolean("wakelock",
+		// false) + "wakelock", Toast.LENGTH_LONG).show();
+		// Initialize the Communicator again as ports and protocol have been
+		// changed
 		new Thread(new Runnable() {
 			public void run() {
 				initializeCommunicator();
@@ -334,7 +350,7 @@ public class MainActivity extends Activity {
 			Ice.InitializationData initData = new Ice.InitializationData();
 			initData.properties = Ice.Util.createProperties();
 			initData.properties.setProperty("Ice.Trace.Network", "3");
-			
+
 			//
 			// Only configure IceSSL if we are using Froyo or later.
 			//
@@ -351,14 +367,13 @@ public class MainActivity extends Activity {
 
 			communicator = Ice.Util.initialize(initData);
 			Ice.ObjectAdapter adapter = communicator
-					.createObjectAdapterWithEndpoints("CameraAdapter",
-							protocol +adapterendpoints + port);
+					.createObjectAdapterWithEndpoints("CameraAdapter", protocol
+							+ adapterendpoints + port);
 			cameraA = new CameraI();
 			adapter.add((Ice.Object) cameraA,
 					Ice.Util.stringToIdentity("cameraA"));
 			adapter.activate();
-			
-			
+
 			Log.e(TAG, cameraA.ice_id());
 
 			/*
