@@ -1,9 +1,15 @@
 package com.linaresdigital.android.androidcameraserver;
 
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
+
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
+import android.content.Intent;
+import android.hardware.Camera;
 import android.os.Bundle;
 
 public class Preferences extends PreferenceActivity implements OnPreferenceChangeListener {
@@ -15,14 +21,14 @@ public class Preferences extends PreferenceActivity implements OnPreferenceChang
     super.onCreate(savedInstanceState);
     addPreferencesFromResource(R.xml.preference);
     lp = (ListPreference) findPreference("listpref");
-    Bundle b = getIntent().getExtras();
-    int[][] resolution = (int[][]) b.getSerializable("Array");
-
-    CharSequence[] entries = new CharSequence[resolution.length];
-    CharSequence[] values = new CharSequence[resolution.length];
-    for (int a = 0; a < resolution.length; a++) {
-      entries[a] = resolution[a][0] + "x" + resolution[a][1];
-      values[a] = resolution[a][0] + " " + resolution[a][1];
+    
+   
+    List<List<Integer>> reslist = CameraPreview.getResList() ;
+    CharSequence[] entries = new CharSequence[reslist.size()];
+    CharSequence[] values = new CharSequence[reslist.size()];
+    for (int a = 0; a < reslist.size(); a++) {
+      entries[a] = reslist.get(a).get(0) + "x" + reslist.get(a).get(1);
+      values[a] = reslist.get(a).get(0) + " " + reslist.get(a).get(1);
     }
     lp.setEntries(entries);
     lp.setEntryValues(values);
