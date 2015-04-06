@@ -51,7 +51,6 @@ public class MainActivity extends Activity {
   private Handler autoFocusHandler;
   private boolean previsualizando = false;
   private FrameLayout preview;
-  private static List<List<Integer>> reslist = new ArrayList<List<Integer>>();
 
   private String adapterendpoints = " -h 0.0.0.0 -p ";
   private String port = "9999";
@@ -217,14 +216,6 @@ public class MainActivity extends Activity {
 
       case R.id.menu_settings:
         Intent i = new Intent(this, Preferences.class);
-        int[][] resolution = new int[reslist.size()][2];
-        for (int a = 0; a < reslist.size(); a++) {
-          resolution[a][0] = reslist.get(a).get(0);
-          resolution[a][1] = reslist.get(a).get(1);
-        }
-        Bundle b = new Bundle();
-        b.putSerializable("Array", resolution);
-        i.putExtras(b);
         startActivity(i);
         break;
 
@@ -288,7 +279,7 @@ public class MainActivity extends Activity {
 
     /* We create an instance of CameraPreview to manage the camera */
     mPreview = new CameraPreview(this, mCamera, previewCb, autoFocusCB, width, height);
-    reslist = mPreview.getResList();
+    
     /* Find the frame that will contain the camera preview */
     preview = (FrameLayout) findViewById(R.id.frameLayout);
     /* Add view to frame */

@@ -136,7 +136,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     }
   }
 
-  public List<List<Integer>> getResList() {
+  public static List<List<Integer>> getResList() {
     return reslist;
   }
 }
