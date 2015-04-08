@@ -1,15 +1,11 @@
 package com.linaresdigital.android.androidcameraserver;
 
-import java.io.Serializable;
-import java.util.Arrays;
 import java.util.List;
 
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
-import android.content.Intent;
-import android.hardware.Camera;
 import android.os.Bundle;
 
 public class Preferences extends PreferenceActivity implements OnPreferenceChangeListener {
