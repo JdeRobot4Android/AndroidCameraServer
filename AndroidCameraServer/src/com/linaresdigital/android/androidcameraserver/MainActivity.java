@@ -8,9 +8,6 @@
 
 package com.linaresdigital.android.androidcameraserver;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
