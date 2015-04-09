@@ -26,27 +26,27 @@ import android.content.pm.ActivityInfo;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnLayoutChangeListener;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements OnLayoutChangeListener {
 
   private static final String TAG = MainActivity.class.getClass().getName();
-  /**
-   * Instance of ImageProvider implementation to be published
-   */
+  /** Instance of ImageProvider implementation to be published */
   private CameraI cameraA;
-  /**
-   * Instance of camera to be used in activity
-   */
+  /** Instance of camera to be used in activity */
   static private Camera mCamera;
-  /**
-   * Instance of implementation of the camera preview that we'll use
-   */
+  /** Instance of implementation of the camera preview that we'll use */
   private CameraPreview mPreview;
+  /** Handler for autofocus when camera doesn't support it */
   private Handler autoFocusHandler;
-  private boolean previsualizando = false;
+  /** Previewing state */
+  private boolean previewing = false;
+  /** Frame layout what contents surface preview */
   private FrameLayout preview;
 
   private String adapterendpoints = " -h 0.0.0.0 -p ";
@@ -58,8 +58,8 @@ public class MainActivity extends Activity {
   PowerManager.WakeLock wl;
 
   /**
-	 * 
-	 */
+   * Prepare and configure activity
+   */
   @Override
   protected void onCreate(Bundle savedInstanceState) {
 
@@ -76,13 +76,6 @@ public class MainActivity extends Activity {
     width = Integer.parseInt(dimensions.substring(0, dimensions.indexOf(" ")));
     height =
         Integer.parseInt(dimensions.substring(dimensions.indexOf(" ") + 1, dimensions.length()));
-
-    // Toast.makeText(getApplicationContext(), dimensions.substring(0,
-    // dimensions.indexOf(" ")), Toast.LENGTH_LONG).show();
-    // Toast.makeText(getApplicationContext(),
-    // dimensions.substring(dimensions.indexOf(" ")+1, dimensions.length()),
-    // Toast.LENGTH_LONG).show();
-
     // Get the value for port and protocol
     port = prefs.getString("Port Number", "9999");
     protocol = prefs.getString("protocol", "default");
@@ -133,6 +126,9 @@ public class MainActivity extends Activity {
     return camara;
   }
 
+  /**
+   * Release all camera resources 
+   */
   private void releaseCamera() {
     if (mCamera != null) {
       /* Disable callbacks */
@@ -142,21 +138,21 @@ public class MainActivity extends Activity {
       mCamera.release();
       mCamera = null;
       /* Save the state */
-      previsualizando = false;
+      previewing = false;
     }
   }
 
   private Runnable doAutoFocus = new Runnable() {
 
     public void run() {
-      if (previsualizando)
+      if (previewing)
         mCamera.autoFocus(autoFocusCB);
     }
   };
 
   PreviewCallback previewCb = new PreviewCallback() {
     public void onPreviewFrame(byte[] data, Camera camera) {
-      previsualizando = true;
+      previewing = true;
       try {
         if (CameraI.idDatos == null)
           return;
@@ -210,35 +206,47 @@ public class MainActivity extends Activity {
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
-
       case R.id.menu_settings:
         Intent i = new Intent(this, Preferences.class);
         startActivity(i);
         break;
-
     }
-
     return true;
   }
 
-  // protected void onActivityResult(int requestCode, int resultCode, Intent
-  // data) {
-  //
-  // if (requestCode == 1) {
-  // if(resultCode == RESULT_OK){
-  // String result=data.getStringExtra("result");
-  // adapterendpoints = "default -h 0.0.0.0 -p "+ result;
-  // new Thread(new Runnable() {
-  // public void run() {
-  // initializeCommunicator();
-  // }
-  // }).start();
-  // }
-  // if (resultCode == RESULT_CANCELED) {
-  // //Code if there's no result
-  // }
-  // }
-  // }//onActivityResult
+  /**
+   * When the layout is about to change (size is calculated previously) use the
+   * size of parent frame to calculate own size to keep preview surface's aspect
+   * ratio
+   */
+  @Override
+  public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft,
+      int oldTop, int oldRight, int oldBottom) {
+    /* Get parent layout (relative frame) to know total application size */
+    RelativeLayout rootLayout = (RelativeLayout) v.getParent();
+    /* Avoid calling this event listener again */
+    v.removeOnLayoutChangeListener(this);
+    /* Get preview frame parameters to change it to keep aspect ratio */
+    RelativeLayout.LayoutParams layoutPreviewParams =
+        (RelativeLayout.LayoutParams) preview.getLayoutParams();
+    /* Calculations needed to keep camera preview aspect ratio */
+    double rootAspectRatio = (double) rootLayout.getWidth() / (double) rootLayout.getHeight();
+    double previewAspectRatio = (double) width / (double) height;
+    if (rootAspectRatio > previewAspectRatio) {
+      /* The height will be the same as parent */
+      layoutPreviewParams.height = rootLayout.getHeight();
+      /* We need to calculate width to keep aspect ratio */
+      layoutPreviewParams.width = (int) (rootLayout.getWidth() / previewAspectRatio);
+    } else {
+      /* The width will be the same as parent */
+      layoutPreviewParams.width = rootLayout.getWidth();
+      /* We need to calculate height to keep aspect ratio */
+      layoutPreviewParams.height = (int) (rootLayout.getHeight() / previewAspectRatio);
+    }
+    /* Tell frame to center in parent relative frame */
+    layoutPreviewParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+    preview.setLayoutParams(layoutPreviewParams);
+  }
 
   public void onStop() {
     super.onStop();
@@ -276,9 +284,12 @@ public class MainActivity extends Activity {
 
     /* We create an instance of CameraPreview to manage the camera */
     mPreview = new CameraPreview(this, mCamera, previewCb, autoFocusCB, width, height);
-    
+
     /* Find the frame that will contain the camera preview */
     preview = (FrameLayout) findViewById(R.id.frameLayout);
+
+    preview.addOnLayoutChangeListener(this);
+
     /* Add view to frame */
     preview.addView(mPreview);
 
@@ -295,11 +306,7 @@ public class MainActivity extends Activity {
     if (prefs.getBoolean("wakelock", false) == true) {
       wl.acquire();
     }
-    // Toast.makeText(getApplicationContext(),
-    // prefs.getBoolean("lockscreen", false) + "lockscreen",
-    // Toast.LENGTH_LONG).show();
-    // Toast.makeText(getApplicationContext(), prefs.getBoolean("wakelock",
-    // false) + "wakelock", Toast.LENGTH_LONG).show();
+
     // Initialize the Communicator again as ports and protocol have been
     // changed
     new Thread(new Runnable() {
@@ -328,19 +335,6 @@ public class MainActivity extends Activity {
       initData.properties = Ice.Util.createProperties();
       initData.properties.setProperty("Ice.Trace.Network", "3");
 
-      //
-      // Only configure IceSSL if we are using Froyo or later.
-      //
-      /*
-       * if(VERSION.SDK_INT >= 8) // android.os.Build.VERSION_CODES.FROYO (8) {
-       * initData.properties.setProperty("IceSSL.Trace.Security", "3");
-       * initData.properties.setProperty("IceSSL.KeystoreType", "BKS");
-       * initData.properties.setProperty("IceSSL.TruststoreType", "BKS");
-       * initData.properties.setProperty("IceSSL.Password", "password");
-       * initData.properties.setProperty("Ice.InitPlugins", "0");
-       * initData.properties.setProperty("Ice.Plugin.IceSSL", "IceSSL.PluginFactory"); }
-       */
-
       communicator = Ice.Util.initialize(initData);
       Ice.ObjectAdapter adapter =
           communicator.createObjectAdapterWithEndpoints("CameraAdapter", protocol
@@ -348,18 +342,6 @@ public class MainActivity extends Activity {
       cameraA = new CameraI();
       adapter.add((Ice.Object) cameraA, Ice.Util.stringToIdentity("cameraA"));
       adapter.activate();
-
-      Log.e(TAG, cameraA.ice_id());
-
-      /*
-       * if(VERSION.SDK_INT >= 8) // android.os.Build.VERSION_CODES.FROYO (8) { IceSSL.Plugin plugin
-       * = (IceSSL.Plugin)communicator.getPluginManager ().getPlugin("IceSSL"); // // Be sure to
-       * pass the same input stream to the SSL plug-in for // both the keystore and the truststore.
-       * This makes startup a // little faster since the plugin will not initialize // two
-       * keystores. // java.io.InputStream certs = getResources().openRawResource(R.raw.certs);
-       * plugin.setKeystoreStream(certs); plugin.setTruststoreStream(certs);
-       * communicator.getPluginManager().initializePlugins(); }
-       */
 
       synchronized (this) {
         _communicator = communicator;
