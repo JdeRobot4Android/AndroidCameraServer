@@ -15,7 +15,6 @@ import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.Size;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Build.VERSION;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.app.Activity;
@@ -48,6 +47,7 @@ public class MainActivity extends Activity implements OnLayoutChangeListener {
   private boolean previewing = false;
   /** Frame layout what contents surface preview */
   private FrameLayout preview;
+  private SharedPreferences prefs;
 
   private String adapterendpoints = " -h 0.0.0.0 -p ";
   private String port = "9999";
@@ -62,7 +62,6 @@ public class MainActivity extends Activity implements OnLayoutChangeListener {
    */
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-
     PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
     wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
     super.onCreate(savedInstanceState);
@@ -71,37 +70,11 @@ public class MainActivity extends Activity implements OnLayoutChangeListener {
     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     /* Provide continuous autofocus if camera does not support it */
     autoFocusHandler = new Handler();
-    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-    dimensions = prefs.getString("listpref", "320 240");
-    width = Integer.parseInt(dimensions.substring(0, dimensions.indexOf(" ")));
-    height =
-        Integer.parseInt(dimensions.substring(dimensions.indexOf(" ") + 1, dimensions.length()));
+    prefs = PreferenceManager.getDefaultSharedPreferences(this);
     // Get the value for port and protocol
     port = prefs.getString("Port Number", "9999");
     protocol = prefs.getString("protocol", "default");
 
-    // Check wakelock and lockscreen
-    if (prefs.getBoolean("lockscreen", false) == true) {
-      getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-    }
-    if (prefs.getBoolean("wakelock", false) == true) {
-      wl.acquire();
-    }
-
-    /* Initialize ICE, copied from an example */
-    /**************************************************************************/
-    if (VERSION.SDK_INT == 8) // android.os.Build.VERSION_CODES.FROYO (8)
-    {
-      //
-      // Workaround for a bug in Android 2.2 (Froyo).
-      //
-      // See http://code.google.com/p/android/issues/detail?id=9431
-      //
-      java.lang.System.setProperty("java.net.preferIPv4Stack", "true");
-      java.lang.System.setProperty("java.net.preferIPv6Addresses", "false");
-    }
-
-    /* Continuing the example copied */
     // SSL initialization can take some time. To avoid blocking the
     // calling thread, we perform the initialization in a separate thread.
     new Thread(new Runnable() {
@@ -109,7 +82,6 @@ public class MainActivity extends Activity implements OnLayoutChangeListener {
         initializeCommunicator();
       }
     }).start();
-    /**************************************************************************/
   }
 
   /**
@@ -127,7 +99,7 @@ public class MainActivity extends Activity implements OnLayoutChangeListener {
   }
 
   /**
-   * Release all camera resources 
+   * Release all camera resources
    */
   private void releaseCamera() {
     if (mCamera != null) {
@@ -215,9 +187,8 @@ public class MainActivity extends Activity implements OnLayoutChangeListener {
   }
 
   /**
-   * When the layout is about to change (size is calculated previously) use the
-   * size of parent frame to calculate own size to keep preview surface's aspect
-   * ratio
+   * When the layout is about to change (size is calculated previously) use the size of parent frame
+   * to calculate own size to keep preview surface's aspect ratio
    */
   @Override
   public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft,
@@ -236,12 +207,12 @@ public class MainActivity extends Activity implements OnLayoutChangeListener {
       /* The height will be the same as parent */
       layoutPreviewParams.height = rootLayout.getHeight();
       /* We need to calculate width to keep aspect ratio */
-      layoutPreviewParams.width = (int) (rootLayout.getWidth() / previewAspectRatio);
+      layoutPreviewParams.width = (int) ((double) rootLayout.getHeight() * previewAspectRatio);
     } else {
       /* The width will be the same as parent */
       layoutPreviewParams.width = rootLayout.getWidth();
       /* We need to calculate height to keep aspect ratio */
-      layoutPreviewParams.height = (int) (rootLayout.getHeight() / previewAspectRatio);
+      layoutPreviewParams.height = (int) ((double) rootLayout.getWidth() * previewAspectRatio);
     }
     /* Tell frame to center in parent relative frame */
     layoutPreviewParams.addRule(RelativeLayout.CENTER_IN_PARENT);
@@ -275,8 +246,6 @@ public class MainActivity extends Activity implements OnLayoutChangeListener {
       this.finish();
     }
 
-    /* We call the Preferences and get the selected values */
-    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
     dimensions = prefs.getString("listpref", "320 240");
     width = Integer.parseInt(dimensions.substring(0, dimensions.indexOf(" ")));
     height =
@@ -288,6 +257,7 @@ public class MainActivity extends Activity implements OnLayoutChangeListener {
     /* Find the frame that will contain the camera preview */
     preview = (FrameLayout) findViewById(R.id.frameLayout);
 
+    /* Change preview size when it have been displayed */
     preview.addOnLayoutChangeListener(this);
 
     /* Add view to frame */
