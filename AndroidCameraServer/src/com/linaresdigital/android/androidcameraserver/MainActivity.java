@@ -239,6 +239,16 @@ public class MainActivity extends Activity implements OnLayoutChangeListener {
   @Override
   protected void onResume() {
     super.onResume();
+    /* Test if preferences was modified */
+    if (Preferences.modified) {
+      /* Clear modified flag */
+      Preferences.modified = false;
+      /* Finish this Activity and reload it again */
+      Toast.makeText(getApplicationContext(), R.string.application_reload, Toast.LENGTH_LONG).show();
+      this.finish();
+      Intent i = new Intent(this, MainActivity.class);
+      startActivity(i);
+    }
     /* Get an instance of the default camera */
     mCamera = getCameraInstance();
     if (mCamera == null) {

@@ -11,15 +11,16 @@ import android.os.Bundle;
 public class Preferences extends PreferenceActivity implements OnPreferenceChangeListener {
 
   ListPreference lp;
+  static boolean modified = false;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     addPreferencesFromResource(R.xml.preference);
     lp = (ListPreference) findPreference("listpref");
-    
-   
-    List<List<Integer>> reslist = CameraPreview.getResList() ;
+    modified = false;
+
+    List<List<Integer>> reslist = CameraPreview.getResList();
     CharSequence[] entries = new CharSequence[reslist.size()];
     CharSequence[] values = new CharSequence[reslist.size()];
     for (int a = 0; a < reslist.size(); a++) {
@@ -34,6 +35,7 @@ public class Preferences extends PreferenceActivity implements OnPreferenceChang
   @Override
   public boolean onPreferenceChange(Preference preference, Object newValue) {
     lp.setValue(newValue.toString());
+    modified = true;
     return false;
   }
 }

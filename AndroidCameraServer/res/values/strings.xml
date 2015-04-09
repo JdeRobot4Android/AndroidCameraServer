@@ -13,6 +13,7 @@
     <string name="wakelocktitle">WakeLock</string>
     <string name="lockscreen">lockscreen</string>
     <string name="lockscreentitle">Lock Screen</string>
+    <string name="application_reload">Reloading application to apply changes</string>
     
 
 </resources>
