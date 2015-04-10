@@ -1,4 +1,4 @@
-package com.linaresdigital.android.androidcameraserver;
+package org.jderobot.androidcameraserver;
 
 import java.io.IOException;
 import java.util.ArrayList;

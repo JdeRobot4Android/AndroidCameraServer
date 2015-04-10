@@ -5,7 +5,7 @@
  * @version 1.0, 2012-12-08
  */
 
-package com.linaresdigital.android.androidcameraserver;
+package org.jderobot.androidcameraserver;
 
 import jderobot.AMD_ImageProvider_getImageData;
 import jderobot.DataNotExistException;

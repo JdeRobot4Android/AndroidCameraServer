@@ -6,7 +6,9 @@
  * @version 1.0, 2013-01-08
  */
 
-package com.linaresdigital.android.androidcameraserver;
+package org.jderobot.androidcameraserver;
+
+import org.jderobot.androidcameraserver.R;
 
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
