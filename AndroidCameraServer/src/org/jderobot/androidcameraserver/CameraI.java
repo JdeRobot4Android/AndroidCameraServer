@@ -1,4 +1,4 @@
-package com.linaresdigital.android.androidcameraserver;
+package org.jderobot.androidcameraserver;
 
 import jderobot.AMD_ImageProvider_getImageData;
 import jderobot.CameraDescription;
