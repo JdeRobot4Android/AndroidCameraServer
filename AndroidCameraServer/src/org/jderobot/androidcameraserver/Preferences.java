@@ -2,7 +2,8 @@ package org.jderobot.androidcameraserver;
 
 import java.util.List;
 
-import com.linaresdigital.android.androidcameraserver.R;
+import org.jderobot.androidcameraserver.R;
+
 
 import android.preference.ListPreference;
 import android.preference.Preference;

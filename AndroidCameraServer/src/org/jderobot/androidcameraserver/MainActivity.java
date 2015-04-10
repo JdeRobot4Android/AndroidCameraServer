@@ -8,7 +8,7 @@
 
 package org.jderobot.androidcameraserver;
 
-import com.linaresdigital.android.androidcameraserver.R;
+import org.jderobot.androidcameraserver.R;
 
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
